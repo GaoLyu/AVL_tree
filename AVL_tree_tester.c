@@ -6,8 +6,6 @@
   or
     AVL_tree_tester
 
-  Author: A. Tafliovich
-  Based heavily on materials developed by F. Estrada.
 */
 #include <stdio.h>
 #include <stdlib.h>

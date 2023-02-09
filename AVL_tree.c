@@ -1,15 +1,4 @@
-/*
-   AVL tree implementation.
-
-   Author: A. Tafliovich
-   Based heavily on materials developed by F. Estrada.
-*/
-
 #include "AVL_tree.h"
-
-/*************************************************************************
- ** Suggested helper functions
- *************************************************************************/
 
 /* Returns the height (number of nodes on the longest root-to-leaf path) of
  * the tree rooted at node 'node'. Returns 0 if 'node' is NULL.
@@ -19,11 +8,11 @@ int height(AVL_Node* node){
     return 0;
   }
   else{
-    if(height(node.left) >= height(node.right)){
-      return height(node.left) + 1;
+    if(height(node->left) >= height(node->right)){
+      return height(node->left) + 1;
     }
     else{
-      return height(node.right) + 1;
+      return height(node->right) + 1;
     }
   }
 }
@@ -32,12 +21,26 @@ int height(AVL_Node* node){
  * of its children. Note: this should be an O(1) operation.
  */
 void update_height(AVL_Node* node){
-  if((node->left)->height >= (node->right)->height){
-    node->height = (node->left)->height + 1;
+  //null
+  if(node->left == NULL && node->right == NULL){
+    node->height = 1;
+  }
+  else if(node->left != NULL && node->right == NULL){
+    node->height = 1 + (node->left)->height;
+  }
+  else if(node->left == NULL && node->right != NULL){
+    node->height = 1 + (node->right)->height;
   }
   else{
-    node->height = (node->right)->height + 1;
+    if((node->left)->height >= (node->right)->height){
+      node->height = ((node->left)->height) + 1;
+    }
+    else{
+      node->height = ((node->right)->height) + 1;
+    }
   }
+
+  
 }
 
 /* Returns the balance factor (height of left subtree - height of right
@@ -47,7 +50,18 @@ int balance_factor(AVL_Node* node){
   if(node==NULL){
     return 0;
   }
-  return (node->left)->height - (node->right)->height;
+  else if(node->left == NULL && node->right == NULL){
+    return 0;
+  }
+  else if(node->left != NULL && node->right == NULL){
+    return (node->left)->height;
+  }
+  else if(node->left == NULL && node->right != NULL){
+    return -((node->right)->height);
+  }
+  else{
+    return (node->left)->height - (node->right)->height;
+  }
 }
 
 /* Returns the result of performing the corresponding rotation in the AVL
@@ -84,6 +98,7 @@ AVL_Node* left_right_rotation(AVL_Node* node){
 
 /* Returns the successor node of 'node'. */
 AVL_Node* successor(AVL_Node* node){
+  AVL_Node* successor = node;
   while(successor->left != NULL){
     successor = successor->left;
   }
@@ -94,7 +109,7 @@ AVL_Node* successor(AVL_Node* node){
  * of 1, and left and right subtrees NULL.
  */
 AVL_Node* create_node(int key, void* value){
-  AVL_Node* node;
+  AVL_Node* node = malloc(sizeof(AVL_Node));
   node->key=key;
   node->value=value;
   node->height=1;
@@ -122,9 +137,7 @@ AVL_Node* balance(AVL_Node *node){
   }
   return node;
 }
-/*************************************************************************
- ** Provided functions
- *************************************************************************/
+
 void print_tree_inorder_(AVL_Node* node, int offset) {
   if (node == NULL) return;
   print_tree_inorder_(node->right, offset + 1);
@@ -142,12 +155,6 @@ void delete_tree(AVL_Node* node) {
   delete_tree(node->right);
   free(node);
 }
-
-/*************************************************************************
- ** Required functions
- ** Must run in O(log n) where n is the number of nodes in a tree rooted
- **  at 'node'.
- *************************************************************************/
 
 AVL_Node* search(AVL_Node* node, int key) {
   if(node == NULL){
@@ -171,25 +178,27 @@ AVL_Node* insert(AVL_Node* node, int key, void* value) {
     return node;
   }
   else{
-    AVL_Node* new=create_node(key, value);
     if(node == NULL){
-      return new;
+      return create_node(key, value);
     }
     else{
       if(node->key < key){
-        node->right = insert(node->right, key);
+        node->right = insert(node->right, key, value);
       }
       else{
-        node->left = insert(node->left, key);
+        node->left = insert(node->left, key, value);
       }
+      
       update_height(node);
+      
       node = balance(node);
+      
+      return node;
     }
-    return node;
   }
-  
 }
-AVL_Node* search_parent(node, successor){
+
+AVL_Node* search_parent(AVL_Node* node, AVL_Node* successor){
   if(node == successor){
     return NULL;
   }
@@ -215,25 +224,31 @@ AVL_Node* delete(AVL_Node* node, int key) {
     }
     else{
       if(node->left == NULL && node->right == NULL){
+        free(node);
         return NULL;
       }
       else if(node->left == NULL && node->right != NULL){
-        return node->right;
+        AVL_Node* new=node->right;
+        free(node);
+        return new;
       }
       else if(node->left != NULL && node->right == NULL){
-        return node->left;
+        AVL_Node* new=node->left;
+        free(node);
+        return new;
       }
-      else(node->left != NULL && node->right != NULL){
-        AVL_Node *successor = successor(node->right);
-        AVL_Node *parent = search_parent(node->right, successor);
+      else{
+        AVL_Node *succ = successor(node->right);
+        AVL_Node *parent = search_parent(node->right, succ);
         if(parent != NULL){
-          parent->left = successor->right;
-          successor->right = node->right;
+          parent->left = succ->right;
+          succ->right = node->right;
           update_height(parent);  
         }
-        successor->left = node->left;
-        update_height(successor);
-        return balance(successor);
+        succ->left = node->left;
+        update_height(succ);
+        free(node);
+        return balance(succ);
       }
     }
     update_height(node);

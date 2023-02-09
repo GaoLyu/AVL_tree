@@ -1,13 +1,3 @@
-/*
-   Header file for our AVL tree implementation.
-
-   Author: A. Tafliovich
-   Based heavily on materials developed by F. Estrada.
-
-   You will NOT be submitting this file. Your code will be tested with the
-   original version of this file, so make sure you do not modify it!
-*/
-
 #include<stdio.h>
 #include<stdlib.h>
 
