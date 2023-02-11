@@ -6,6 +6,8 @@
   or
     AVL_tree_tester
 
+  Author: A. Tafliovich
+  Based heavily on materials developed by F. Estrada.
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,7 +61,7 @@ void test_tree(AVL_Node* root) {
   AVL_Node* node;
 
   while (1) {
-    printf("Choose a command: (s)earch, (i)nsert, (d)elete, (q)uit\n");
+    printf("Choose a command: (s)earch, (i)nsert, (d)elete, (m)in_difference, (q)uit\n");
     fgets(&line[0], MAX_LIMIT, stdin);
     if (line[0] == 'q') {  // quit
       printf("Quit selected. Goodbye!\n");
@@ -80,12 +82,20 @@ void test_tree(AVL_Node* root) {
       printf(" (no values in this simple tester): ");
       fgets(&line[0], MAX_LIMIT, stdin);
       root = insert(root, atoi(&line[0]), NULL);
+      
+      printf("Have inserted");
+      printf("height is %d, key is %d\n",root->height,root->key);
+
       print_tree_report(root);
     } else if (line[0] == 'd') {  // delete
       printf("Delete selected. Enter key to delete: ");
       fgets(&line[0], MAX_LIMIT, stdin);
       root = delete(root, atoi(&line[0]));
       print_tree_report(root);
+    } else if (line[0] == 'm') {  // min differece
+      int pair[2];
+      min_difference(root,pair);
+      printf("Min difference selected. The pair is %d, %d\n", pair[0], pair[1]);
     }
   }
 }

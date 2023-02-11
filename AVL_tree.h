@@ -1,3 +1,13 @@
+/*
+   Header file for our AVL tree implementation.
+
+   Author: A. Tafliovich
+   Based heavily on materials developed by F. Estrada.
+
+   You will NOT be submitting this file. Your code will be tested with the
+   original version of this file, so make sure you do not modify it!
+*/
+
 #include<stdio.h>
 #include<stdlib.h>
 
@@ -10,6 +20,13 @@ typedef struct avl_node {
   int height;              // height of tree rooted at this node
   struct avl_node* left;   // this node's left child
   struct avl_node* right;  // this node's right child
+  int rightmost;
+  int leftmost;
+  int min;
+  int max;
+  int diff;
+
+
 } AVL_Node;
 
 /* Returns the node, from the tree rooted at 'node', that contains key 'key'.
@@ -34,6 +51,7 @@ AVL_Node* delete(AVL_Node* node, int key);
  * traversal order.
  */
 void print_tree_inorder(AVL_Node* node);
+void min_difference(AVL_Node* node, int pair[2]);
 
 
 /* Frees all memory allocated for an AVL tree rooted at 'node'.
