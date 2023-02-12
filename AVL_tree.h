@@ -25,8 +25,6 @@ typedef struct avl_node {
   int min;
   int max;
   int diff;
-
-
 } AVL_Node;
 
 /* Returns the node, from the tree rooted at 'node', that contains key 'key'.
@@ -57,5 +55,9 @@ void min_difference(AVL_Node* node, int pair[2]);
 /* Frees all memory allocated for an AVL tree rooted at 'node'.
  */
 void delete_tree(AVL_Node* node);
+
+/* Returns the pair of keys that have the minimum difference.
+ */
+void min_difference(AVL_Node * node, int pair[2]);
 
 #endif
