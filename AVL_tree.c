@@ -63,22 +63,17 @@ AVL_Node * successor(AVL_Node * node) {
   return successor;
 }
 
-/* Updates rightmost, leftmost, min, max in node.
+/* Updates min, max in node.
  */
 void update_most(AVL_Node * node) {
-  //for rightmost: compare node->left and node->left->rightmost
   if (node -> left == NULL) {
-    node -> rightmost = ninf;
     node -> min = node -> key;
   } else {
-    node -> rightmost = node -> left -> max;
     node -> min = node -> left -> min;
   }
   if (node -> right == NULL) {
-    node -> leftmost = pinf;
     node -> max = node -> key;
   } else {
-    node -> leftmost = node -> right -> min;
     node -> max = node -> right -> max;
   }
 }
@@ -86,28 +81,24 @@ void update_most(AVL_Node * node) {
 /* Updates minimun difference in node.
  */
 void update_diff(AVL_Node * node) {
-  int n_r = pinf;
   int n_l = pinf;
+  int n_r = pinf;
   int n = pinf;
   int l_m = pinf;
   int r_m = pinf;
   int c = pinf;
-  if (node -> rightmost != ninf) {
-    n_r = node -> key - node -> rightmost;
-  }
-  if (node -> leftmost != pinf) {
-    n_l = -node -> key + node -> leftmost;
-  }
   if (node -> left != NULL) {
     l_m = node -> left -> diff;
+    n_l = node -> key - node -> left -> max;
   }
   if (node -> right != NULL) {
     r_m = node -> right -> diff;
+    n_r = node -> right -> min - node -> key;
   }
-  if (n_r < n_l) {
-    n = n_r;
-  } else {
+  if (n_l < n_r) {
     n = n_l;
+  } else {
+    n = n_r;
   }
   if (l_m < r_m) {
     c = l_m;
@@ -165,8 +156,7 @@ AVL_Node * left_right_rotation(AVL_Node * node) {
 }
 
 /* Creates and returns an AVL tree node with key 'key', value 'value', height
- * of 1, left and right subtrees NULL, rightmost ninf, leftmost pinf,
- * min 'key', max 'key', diff pinf.
+ * of 1, left and right subtrees NULL, min 'key', max 'key', diff pinf.
  */
 AVL_Node * create_node(int key, void * value) {
   AVL_Node * node = malloc(sizeof(AVL_Node));
@@ -175,8 +165,6 @@ AVL_Node * create_node(int key, void * value) {
   node -> height = 1;
   node -> left = NULL;
   node -> right = NULL;
-  node -> rightmost = ninf;
-  node -> leftmost = pinf;
   node -> min = key;
   node -> max = key;
   node -> diff = pinf;
@@ -206,7 +194,7 @@ AVL_Node * rebalance(AVL_Node * node) {
 void print_tree_inorder_(AVL_Node * node, int offset) {
   if (node == NULL) return;
   print_tree_inorder_(node -> right, offset + 1);
-  printf("%*s %d [%d]                     rightmost: %d, leftmost: %d, diff: %d\n", offset * 2, "", node -> key, node -> height, node -> rightmost, node -> leftmost, node -> diff);
+  printf("%*s %d [%d]                     min: %d, max: %d, diff: %d\n", offset * 2, "", node -> key, node -> height, node -> min, node -> max, node -> diff);
   //printf("%*s %d [%d]\n", offset, "", node->key, node->height);
   print_tree_inorder_(node -> left, offset + 1);
 }
@@ -291,30 +279,24 @@ void min_difference(AVL_Node * node, int pair[2]) {
     pair[0] = -1;
     pair[1] = -1;
   } else {
-    int n_r = pinf;
     int n_l = pinf;
+    int n_r = pinf;
     int r_m = pinf;
     int l_m = pinf;
-
-    if (node -> rightmost != ninf) {
-      n_r = node -> key - node -> rightmost;
-    }
-    if (node -> leftmost != pinf) {
-      n_l = -node -> key + node -> leftmost;
-    }
     if (node -> left != NULL) {
       l_m = node -> left -> diff;
+      n_l = node -> key - node -> left -> max;
     }
     if (node -> right != NULL) {
       r_m = node -> right -> diff;
+      n_r = node -> right -> min - node -> key;
     }
-
-    if (node -> diff == n_r) {
+    if (node -> diff == n_l) {
       pair[0] = node -> key;
-      pair[1] = node -> rightmost;
-    } else if (node -> diff == n_l) {
+      pair[1] = node -> left -> max;
+    } else if (node -> diff == n_r) {
       pair[0] = node -> key;
-      pair[1] = node -> leftmost;
+      pair[1] = node -> right -> min;
     } else if (node -> diff == r_m) {
       min_difference(node -> right, pair);
     } else if (node -> diff == l_m) {
